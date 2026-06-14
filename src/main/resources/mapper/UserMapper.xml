@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 用户数据访问层 SQL 映射（MyBatis Mapper XML） -->
+<mapper namespace="com.uav.system.repository.mapper.UserMapper">
+    
+    <select id="findByUsername" resultType="com.uav.system.domain.entity.User"><!-- 根据用户名查询用户 -->
+        SELECT id, username, password, role
+        FROM users
+        WHERE username = #{username}
+    </select>
+    
+</mapper>

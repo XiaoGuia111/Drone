@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+  UAV 数据访问层 SQL 映射（MyBatis Mapper XML）
+
+  对应 Java Mapper 接口：com.uav.system.repository.mapper.UavMapper
+  表名：uavs
+
+  提供功能：
+    - 完整 CRUD（插入、更新、删除、按 ID/序列号查询）
+    - 分页全量查询（findAll + count）
+    - 多条件动态搜索（search + searchCount）
+
+  注意：所有查询参数均使用 #{} MyBatis 预编译占位符，防止 SQL 注入。
+        搜索条件中的 LIKE 使用 '%' || #{xxx} || '%' 语法（SQLite 兼容）。
+-->
+<mapper namespace="com.uav.system.repository.mapper.UavMapper">
+
+    <!-- 分页查询全部无人机（按 ID 倒序） -->
+    <select id="findAll" resultType="com.uav.system.domain.entity.Uav">
+        SELECT id, name, model, serial_number, manufacturer, manufacture_date, max_altitude, max_speed, weight, status, description, created_at, updated_at
+        FROM uavs
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 统计无人机总记录数 -->
+    <select id="count" resultType="long">
+        SELECT COUNT(*) FROM uavs
+    </select>
+
+    <!-- 按 ID 查询无人机 -->
+    <select id="findById" resultType="com.uav.system.domain.entity.Uav">
+        SELECT id, name, model, serial_number, manufacturer, manufacture_date, max_altitude, max_speed, weight, status, description, created_at, updated_at
+        FROM uavs
+        WHERE id = #{id}
+    </select>
+
+    <!-- 按序列号查询无人机（唯一约束，用于重复校验） -->
+    <select id="findBySerialNumber" resultType="com.uav.system.domain.entity.Uav">
+        SELECT id, name, model, serial_number, manufacturer, manufacture_date, max_altitude, max_speed, weight, status, description, created_at, updated_at
+        FROM uavs
+        WHERE serial_number = #{serialNumber}
+    </select>
+
+    <!-- 新增无人机（自动回填自增主键 ID） -->
+    <insert id="insert" parameterType="com.uav.system.domain.entity.Uav" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO uavs (name, model, serial_number, manufacturer, manufacture_date, max_altitude, max_speed, weight, status, description, created_at, updated_at)
+        VALUES (#{name}, #{model}, #{serialNumber}, #{manufacturer}, #{manufactureDate}, #{maxAltitude}, #{maxSpeed}, #{weight}, #{status}, #{description}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+    </insert>
+
+    <!-- 更新无人机信息（按 ID） -->
+    <update id="update" parameterType="com.uav.system.domain.entity.Uav">
+        UPDATE uavs
+        SET name = #{name},
+            model = #{model},
+            serial_number = #{serialNumber},
+            manufacturer = #{manufacturer},
+            manufacture_date = #{manufactureDate},
+            max_altitude = #{maxAltitude},
+            max_speed = #{maxSpeed},
+            weight = #{weight},
+            status = #{status},
+            description = #{description},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <!-- 按 ID 删除无人机 -->
+    <delete id="deleteById">
+        DELETE FROM uavs WHERE id = #{id}
+    </delete>
+
+    <!-- 多条件组合搜索（分页，带动态 SQL） -->
+    <select id="search" resultType="com.uav.system.domain.entity.Uav">
+        SELECT id, name, model, serial_number, manufacturer, manufacture_date, max_altitude, max_speed, weight, status, description, created_at, updated_at
+        FROM uavs
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND name LIKE '%' || #{name} || '%'
+        </if>
+        <if test="model != null and model != ''">
+            AND model LIKE '%' || #{model} || '%'
+        </if>
+        <if test="serialNumber != null and serialNumber != ''">
+            AND serial_number LIKE '%' || #{serialNumber} || '%'
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+        ORDER BY id DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 统计符合条件的搜索记录数（与 search 条件一致） -->
+    <select id="searchCount" resultType="long">
+        SELECT COUNT(*)
+        FROM uavs
+        WHERE 1=1
+        <if test="name != null and name != ''">
+            AND name LIKE '%' || #{name} || '%'
+        </if>
+        <if test="model != null and model != ''">
+            AND model LIKE '%' || #{model} || '%'
+        </if>
+        <if test="serialNumber != null and serialNumber != ''">
+            AND serial_number LIKE '%' || #{serialNumber} || '%'
+        </if>
+        <if test="status != null and status != ''">
+            AND status = #{status}
+        </if>
+    </select>
+
+</mapper>

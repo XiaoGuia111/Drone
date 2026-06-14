@@ -1,0 +1,70 @@
+# ============================================================
+# 无人机信息管理系统 — 应用配置
+# 使用 YAML 多文档块（---）分隔不同 Profile 的配置
+# 默认激活 sqlite profile
+# ============================================================
+
+server:
+  port: 8088
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  profiles:
+    active: sqlite
+  main:
+    allow-bean-definition-overriding: true
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  # Thymeleaf 视图层配置
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+    servlet:
+      content-type: text/html
+
+---
+# SQLite 开发环境配置
+# 使用文件型 SQLite 数据库，无需额外安装数据库服务，方便本地开发调试
+spring:
+  profiles: sqlite
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:./data/uav.db
+    type: com.alibaba.druid.pool.DruidDataSource
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      encoding: UTF-8
+
+---
+# MySQL 生产环境配置（可选）
+# 使用前需在本地安装 MySQL 并创建 uav_db 数据库
+spring:
+  profiles: mysql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/uav_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+
+# MyBatis 全局配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.uav.system.domain.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+# 日志级别配置
+logging:
+  level:
+    com.uav.system: debug
+    org.springframework.jdbc: debug
