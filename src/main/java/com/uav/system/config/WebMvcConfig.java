@@ -22,6 +22,12 @@ public class WebMvcConfig implements WebMvcConfigurer {
         this.loggingInterceptor = loggingInterceptor;
     }
 
+    /**
+     * 添加自定义拦截器
+     * <p>拦截所有 {@code /api/**} 路径的请求，记录请求 URL、方法和执行耗时。</p>
+     *
+     * @param registry 拦截器注册表
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loggingInterceptor)

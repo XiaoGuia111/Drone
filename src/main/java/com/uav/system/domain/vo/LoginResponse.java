@@ -2,23 +2,19 @@ package com.uav.system.domain.vo;
 
 import com.uav.system.domain.entity.User;
 
-/**
- * 登录响应结果
- *
- * <p>登录成功后返回用户信息和 Shiro 会话 ID。</p>
- */
+//登录响应结果
 public class LoginResponse {
     /** 当前登录用户信息 */
     private User user;
-    /** Shiro 会话 ID */
-    private String sessionId;
+    /** JWT Token 字符串（Bearer 模式） */
+    private String token;
 
     public LoginResponse() {
     }
 
-    public LoginResponse(User user, String sessionId) {
+    public LoginResponse(User user, String token) {
         this.user = user;
-        this.sessionId = sessionId;
+        this.token = token;
     }
 
     public User getUser() {
@@ -29,11 +25,11 @@ public class LoginResponse {
         this.user = user;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public String getToken() {
+        return token;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

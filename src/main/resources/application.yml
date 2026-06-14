@@ -19,15 +19,6 @@ spring:
       charset: UTF-8
       enabled: true
       force: true
-  # Thymeleaf 视图层配置
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
-    mode: HTML
-    encoding: UTF-8
-    cache: false
-    servlet:
-      content-type: text/html
 
 ---
 # SQLite 开发环境配置
@@ -58,10 +49,10 @@ spring:
 
 # MyBatis 全局配置
 mybatis:
-  mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.uav.system.domain.entity
+  mapper-locations: classpath:mapper/*.xml # 告诉MyBatis 去哪里找Mapper.xml文件，并且把其中SQL语句加载到内存中
+  type-aliases-package: com.uav.system.domain.entity # 告诉MyBatis 去哪里找实体类包，用于简化实体类类名
   configuration:
-    map-underscore-to-camel-case: true
+    map-underscore-to-camel-case: true # 开启下划线映射到驼峰命名法，自动映射数据库表字段->实体类字段
 
 # 日志级别配置
 logging:

@@ -20,7 +20,7 @@ public class UavServiceImpl implements UavService {
 
     private final UavMapper uavMapper;// 无人机数据访问层
 
-    public UavServiceImpl(UavMapper uavMapper) {
+       public UavServiceImpl(UavMapper uavMapper) {
         this.uavMapper = uavMapper;
     }// 构造函数，注入无人机数据访问层
 
@@ -32,7 +32,7 @@ public class UavServiceImpl implements UavService {
         // 步骤 2：如果序列号已存在，抛出异常
         if (existing != null) {
             throw new DuplicateSerialNumberException("Serial number already exists: " + dto.getSerialNumber());
-        } // 步骤 3：如果序列号不存在，继续创建无人机记录
+        }// 步骤 3：如果序列号不存在，继续创建无人机记录
 
         Uav uav = convertToEntity(dto);// 转换为实体
         uav.setCreatedAt(LocalDateTime.now());// 设置创建时间
@@ -113,7 +113,7 @@ public class UavServiceImpl implements UavService {
 
         return new PageResult<>(dtos, total, page, size);
     }
-
+    
     // 查询无人机（分页）
     @Override
     public PageResult<UavDTO> searchUavs(UavQueryDTO queryDTO, int page, int size) {
@@ -124,12 +124,14 @@ public class UavServiceImpl implements UavService {
                 queryDTO.getSerialNumber(),
                 queryDTO.getStatus(),
                 offset,
-                size);
+                size
+        );
         long total = uavMapper.searchCount(
                 queryDTO.getName(),
                 queryDTO.getModel(),
                 queryDTO.getSerialNumber(),
-                queryDTO.getStatus());
+                queryDTO.getStatus()
+        );
 
         List<UavDTO> dtos = uavs.stream()
                 .map(this::convertToDTO)
@@ -140,9 +142,7 @@ public class UavServiceImpl implements UavService {
 
     /**
      * 将数据传输对象（DTO）转换为数据库实体对象（Entity）
-     * <p>
-     * 适用于新增和更新操作，ID 和审计时间字段由调用方单独设置。
-     * </p>
+     * <p>适用于新增和更新操作，ID 和审计时间字段由调用方单独设置。</p>
      *
      * @param dto 无人机 DTO
      * @return 无人机 Entity
@@ -167,9 +167,7 @@ public class UavServiceImpl implements UavService {
 
     /**
      * 将数据库实体对象（Entity）转换为数据传输对象（DTO）
-     * <p>
-     * 适用于返回给前端的数据组装，隐藏实体层敏感或冗余字段。
-     * </p>
+     * <p>适用于返回给前端的数据组装，隐藏实体层敏感或冗余字段。</p>
      *
      * @param uav 无人机 Entity
      * @return 无人机 DTO
