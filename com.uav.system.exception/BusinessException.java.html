@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BusinessException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.exception</a> &gt; <span class="el_source">BusinessException.java</span></div><h1>BusinessException.java</h1><pre class="source lang-java linenums">package com.uav.system.exception;
+
+/**
+ * 通用业务异常
+ *
+ * &lt;p&gt;业务逻辑层面的异常基类，继承自 {@link RuntimeException}（非受检异常），
+ * 由 {@link GlobalExceptionHandler} 统一捕获并转换为标准错误响应返回前端。&lt;/p&gt;
+ *
+ * &lt;p&gt;当抛出此异常时，HTTP 状态码默认为 500，消息内容会直接返回给前端。
+ * &lt;b&gt;注意：&lt;/b&gt;不要在消息中泄露敏感信息（如数据库详情、堆栈信息）。&lt;/p&gt;
+ *
+ * @see GlobalExceptionHandler
+ */
+public class BusinessException extends RuntimeException {
+    public BusinessException(String message) {
+<span class="fc" id="L16">        super(message);</span>
+<span class="fc" id="L17">    }</span>
+
+    public BusinessException(String message, Throwable cause) {
+<span class="nc" id="L20">        super(message, cause);</span>
+<span class="nc" id="L21">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

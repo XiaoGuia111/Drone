@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UavServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.service.impl</a> &gt; <span class="el_source">UavServiceImpl.java</span></div><h1>UavServiceImpl.java</h1><pre class="source lang-java linenums">package com.uav.system.service.impl;
+
+import com.uav.system.domain.dto.UavDTO;
+import com.uav.system.domain.dto.UavQueryDTO;
+import com.uav.system.domain.entity.Uav;
+import com.uav.system.domain.vo.PageResult;
+import com.uav.system.exception.DuplicateSerialNumberException;
+import com.uav.system.exception.ResourceNotFoundException;
+import com.uav.system.repository.mapper.UavMapper;
+import com.uav.system.service.api.UavService;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.stereotype.Service;
+
+// 无人机管理服务实现
+
+@Service
+public class UavServiceImpl implements UavService {
+
+    private final UavMapper uavMapper;// 无人机数据访问层
+
+<span class="fc" id="L23">    public UavServiceImpl(UavMapper uavMapper) {</span>
+<span class="fc" id="L24">        this.uavMapper = uavMapper;</span>
+<span class="fc" id="L25">    }// 构造函数，注入无人机数据访问层</span>
+
+    // 创建无人机
+    @Override
+    public UavDTO createUav(UavDTO dto) {
+        // 步骤 1：检查序列号是否与其他记录冲突
+<span class="fc" id="L31">        Uav existing = uavMapper.findBySerialNumber(dto.getSerialNumber());</span>
+        // 步骤 2：如果序列号已存在，抛出异常
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (existing != null) {</span>
+<span class="fc" id="L34">            throw new DuplicateSerialNumberException(&quot;Serial number already exists: &quot; + dto.getSerialNumber());</span>
+        } // 步骤 3：如果序列号不存在，继续创建无人机记录
+
+<span class="fc" id="L37">        Uav uav = convertToEntity(dto);// 转换为实体</span>
+<span class="fc" id="L38">        uav.setCreatedAt(LocalDateTime.now());// 设置创建时间</span>
+<span class="fc" id="L39">        uav.setUpdatedAt(LocalDateTime.now());// 设置更新时间</span>
+<span class="fc" id="L40">        uavMapper.insert(uav);// 插入数据库</span>
+
+<span class="fc" id="L42">        return convertToDTO(uav);// 转换为DTO并返回</span>
+    }
+
+    // 更新无人机
+    @Override
+    public UavDTO updateUav(Long id, UavDTO dto) {
+        // 步骤 1：检查待更新的无人机是否存在
+<span class="fc" id="L49">        Uav existing = uavMapper.findById(id);</span>
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        if (existing == null) {</span>
+<span class="nc" id="L51">            throw new ResourceNotFoundException(&quot;UAV not found with id: &quot; + id);</span>
+        }
+
+        // 步骤 2：检查序列号是否与其他记录冲突（排除自身）
+        // id != null 的判断确保：如果是自己原有的序列号则不报冲突
+<span class="fc" id="L56">        Uav uavWithSameSn = uavMapper.findBySerialNumber(dto.getSerialNumber());</span>
+<span class="pc bpc" id="L57" title="2 of 4 branches missed.">        if (uavWithSameSn != null &amp;&amp; !uavWithSameSn.getId().equals(id)) {</span>
+<span class="nc" id="L58">            throw new DuplicateSerialNumberException(&quot;Serial number already exists: &quot; + dto.getSerialNumber());</span>
+        }
+
+<span class="fc" id="L61">        Uav uav = convertToEntity(dto);</span>
+<span class="fc" id="L62">        uav.setId(id);</span>
+<span class="fc" id="L63">        uav.setCreatedAt(existing.getCreatedAt()); // 保留原始创建时间</span>
+<span class="fc" id="L64">        uav.setUpdatedAt(LocalDateTime.now());</span>
+<span class="fc" id="L65">        uavMapper.update(uav);</span>
+
+<span class="fc" id="L67">        return convertToDTO(uav);</span>
+    }
+
+    // 删除无人机
+    @Override
+    public void deleteUav(Long id) {
+<span class="fc" id="L73">        Uav existing = uavMapper.findById(id);</span>
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (existing == null) {</span>
+<span class="nc" id="L75">            throw new ResourceNotFoundException(&quot;UAV not found with id: &quot; + id);</span>
+        }
+<span class="fc" id="L77">        uavMapper.deleteById(id);</span>
+<span class="fc" id="L78">    }</span>
+
+    // 查询无人机详情
+    @Override
+    public UavDTO getUavById(Long id) {
+<span class="fc" id="L83">        Uav uav = uavMapper.findById(id);</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (uav == null) {</span>
+<span class="fc" id="L85">            throw new ResourceNotFoundException(&quot;UAV not found with id: &quot; + id);</span>
+        }
+<span class="fc" id="L87">        return convertToDTO(uav);</span>
+    }
+
+    // 查询无人机详情（根据序列号）
+    @Override
+    public UavDTO getUavBySerialNumber(String sn) {
+<span class="nc" id="L93">        Uav uav = uavMapper.findBySerialNumber(sn);</span>
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (uav == null) {</span>
+<span class="nc" id="L95">            throw new ResourceNotFoundException(&quot;UAV not found with serial number: &quot; + sn);</span>
+        }
+<span class="nc" id="L97">        return convertToDTO(uav);</span>
+    }
+
+    // 查询所有无人机（分页）
+    @Override
+    public PageResult&lt;UavDTO&gt; listUavs(int page, int size) {
+        // 计算 OFFSET（页码从 1 开始）
+        // 注意：OFFSET 分页在大数据量时性能退化明显，建议大数据场景改用 keyset pagination
+<span class="fc" id="L105">        int offset = (page - 1) * size;</span>
+<span class="fc" id="L106">        List&lt;Uav&gt; uavs = uavMapper.findAll(offset, size);</span>
+<span class="fc" id="L107">        long total = uavMapper.count();</span>
+
+        // 实体列表 → DTO 列表转换
+<span class="fc" id="L110">        List&lt;UavDTO&gt; dtos = uavs.stream()</span>
+<span class="fc" id="L111">                .map(this::convertToDTO)</span>
+<span class="fc" id="L112">                .collect(Collectors.toList());</span>
+
+<span class="fc" id="L114">        return new PageResult&lt;&gt;(dtos, total, page, size);</span>
+    }
+
+    // 查询无人机（分页）
+    @Override
+    public PageResult&lt;UavDTO&gt; searchUavs(UavQueryDTO queryDTO, int page, int size) {
+<span class="nc" id="L120">        int offset = (page - 1) * size;</span>
+<span class="nc" id="L121">        List&lt;Uav&gt; uavs = uavMapper.search(</span>
+<span class="nc" id="L122">                queryDTO.getName(),</span>
+<span class="nc" id="L123">                queryDTO.getModel(),</span>
+<span class="nc" id="L124">                queryDTO.getSerialNumber(),</span>
+<span class="nc" id="L125">                queryDTO.getStatus(),</span>
+                offset,
+                size);
+<span class="nc" id="L128">        long total = uavMapper.searchCount(</span>
+<span class="nc" id="L129">                queryDTO.getName(),</span>
+<span class="nc" id="L130">                queryDTO.getModel(),</span>
+<span class="nc" id="L131">                queryDTO.getSerialNumber(),</span>
+<span class="nc" id="L132">                queryDTO.getStatus());</span>
+
+<span class="nc" id="L134">        List&lt;UavDTO&gt; dtos = uavs.stream()</span>
+<span class="nc" id="L135">                .map(this::convertToDTO)</span>
+<span class="nc" id="L136">                .collect(Collectors.toList());</span>
+
+<span class="nc" id="L138">        return new PageResult&lt;&gt;(dtos, total, page, size);</span>
+    }
+
+    /**
+     * 将数据传输对象（DTO）转换为数据库实体对象（Entity）
+     * &lt;p&gt;
+     * 适用于新增和更新操作，ID 和审计时间字段由调用方单独设置。
+     * &lt;/p&gt;
+     *
+     * @param dto 无人机 DTO
+     * @return 无人机 Entity
+     */
+    private Uav convertToEntity(UavDTO dto) {
+<span class="fc" id="L151">        Uav uav = new Uav();</span>
+<span class="fc" id="L152">        uav.setId(dto.getId());</span>
+<span class="fc" id="L153">        uav.setName(dto.getName());</span>
+<span class="fc" id="L154">        uav.setModel(dto.getModel());</span>
+<span class="fc" id="L155">        uav.setSerialNumber(dto.getSerialNumber());</span>
+<span class="fc" id="L156">        uav.setManufacturer(dto.getManufacturer());</span>
+<span class="fc" id="L157">        uav.setManufactureDate(dto.getManufactureDate());</span>
+<span class="fc" id="L158">        uav.setMaxAltitude(dto.getMaxAltitude());</span>
+<span class="fc" id="L159">        uav.setMaxSpeed(dto.getMaxSpeed());</span>
+<span class="fc" id="L160">        uav.setWeight(dto.getWeight());</span>
+<span class="fc" id="L161">        uav.setStatus(dto.getStatus());</span>
+<span class="fc" id="L162">        uav.setDescription(dto.getDescription());</span>
+<span class="fc" id="L163">        uav.setCreatedAt(dto.getCreatedAt());</span>
+<span class="fc" id="L164">        uav.setUpdatedAt(dto.getUpdatedAt());</span>
+<span class="fc" id="L165">        return uav;</span>
+    }
+
+    /**
+     * 将数据库实体对象（Entity）转换为数据传输对象（DTO）
+     * &lt;p&gt;
+     * 适用于返回给前端的数据组装，隐藏实体层敏感或冗余字段。
+     * &lt;/p&gt;
+     *
+     * @param uav 无人机 Entity
+     * @return 无人机 DTO
+     */
+    private UavDTO convertToDTO(Uav uav) {
+<span class="fc" id="L178">        UavDTO dto = new UavDTO();</span>
+<span class="fc" id="L179">        dto.setId(uav.getId());</span>
+<span class="fc" id="L180">        dto.setName(uav.getName());</span>
+<span class="fc" id="L181">        dto.setModel(uav.getModel());</span>
+<span class="fc" id="L182">        dto.setSerialNumber(uav.getSerialNumber());</span>
+<span class="fc" id="L183">        dto.setManufacturer(uav.getManufacturer());</span>
+<span class="fc" id="L184">        dto.setManufactureDate(uav.getManufactureDate());</span>
+<span class="fc" id="L185">        dto.setMaxAltitude(uav.getMaxAltitude());</span>
+<span class="fc" id="L186">        dto.setMaxSpeed(uav.getMaxSpeed());</span>
+<span class="fc" id="L187">        dto.setWeight(uav.getWeight());</span>
+<span class="fc" id="L188">        dto.setStatus(uav.getStatus());</span>
+<span class="fc" id="L189">        dto.setDescription(uav.getDescription());</span>
+<span class="fc" id="L190">        dto.setCreatedAt(uav.getCreatedAt());</span>
+<span class="fc" id="L191">        dto.setUpdatedAt(uav.getUpdatedAt());</span>
+<span class="fc" id="L192">        return dto;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

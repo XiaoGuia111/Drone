@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LoginResponse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.domain.vo</a> &gt; <span class="el_source">LoginResponse.java</span></div><h1>LoginResponse.java</h1><pre class="source lang-java linenums">package com.uav.system.domain.vo;
+
+import com.uav.system.domain.entity.User;
+
+/**
+ * 登录响应结果
+ *
+ * &lt;p&gt;登录成功后返回用户信息和 Shiro 会话 ID。&lt;/p&gt;
+ */
+public class LoginResponse {
+    /** 当前登录用户信息 */
+    private User user;
+    /** Shiro 会话 ID */
+    private String sessionId;
+
+<span class="nc" id="L16">    public LoginResponse() {</span>
+<span class="nc" id="L17">    }</span>
+
+<span class="nc" id="L19">    public LoginResponse(User user, String sessionId) {</span>
+<span class="nc" id="L20">        this.user = user;</span>
+<span class="nc" id="L21">        this.sessionId = sessionId;</span>
+<span class="nc" id="L22">    }</span>
+
+    public User getUser() {
+<span class="nc" id="L25">        return user;</span>
+    }
+
+    public void setUser(User user) {
+<span class="nc" id="L29">        this.user = user;</span>
+<span class="nc" id="L30">    }</span>
+
+    public String getSessionId() {
+<span class="nc" id="L33">        return sessionId;</span>
+    }
+
+    public void setSessionId(String sessionId) {
+<span class="nc" id="L37">        this.sessionId = sessionId;</span>
+<span class="nc" id="L38">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

@@ -1,0 +1,30 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+UAV Management System,com.uav.system.config.shiro,ShiroRealm,50,12,6,0,14,4,5,1,2,1
+UAV Management System,com.uav.system.config.shiro,ShiroRealm.new CredentialsMatcher() {...},16,6,0,0,3,1,1,1,1,1
+UAV Management System,com.uav.system.config.shiro,ShiroConfig,0,105,0,0,0,28,0,5,0,5
+UAV Management System,com.uav.system.domain.enums,UavStatus,48,0,0,0,8,0,3,0,3,0
+UAV Management System,com.uav.system.domain.entity,User,13,18,0,0,5,9,4,5,4,5
+UAV Management System,com.uav.system.domain.entity,Uav,0,94,0,0,0,41,0,27,0,27
+UAV Management System,com.uav.system.interceptor,LoggingInterceptor,63,7,2,0,15,2,3,2,2,2
+UAV Management System,com.uav.system.config,CorsConfig,0,33,0,0,0,9,0,2,0,2
+UAV Management System,com.uav.system.config,LocalDateTypeHandler,35,15,5,1,6,4,6,3,3,3
+UAV Management System,com.uav.system.config,WebMvcConfig,13,6,0,0,3,3,1,1,1,1
+UAV Management System,com.uav.system.config,DataSourceInitializerConfig,0,34,0,0,0,11,0,3,0,3
+UAV Management System,com.uav.system.config,LocalDateTimeTypeHandler,48,17,5,1,17,5,6,3,3,3
+UAV Management System,com.uav.system.config,MyBatisConfig,0,41,0,0,0,12,0,2,0,2
+UAV Management System,com.uav.system.exception,ResourceNotFoundException,0,4,0,0,0,2,0,1,0,1
+UAV Management System,com.uav.system.exception,DuplicateSerialNumberException,0,4,0,0,0,2,0,1,0,1
+UAV Management System,com.uav.system.exception,BusinessException,5,4,0,0,2,2,1,1,1,1
+UAV Management System,com.uav.system.exception,GlobalExceptionHandler,57,3,0,0,8,1,6,1,6,1
+UAV Management System,com.uav.system.controller,AuthController,77,6,4,0,22,3,5,1,3,1
+UAV Management System,com.uav.system.controller,UavController,38,80,13,5,7,23,9,7,0,7
+UAV Management System,com.uav.system.controller,PageController,8,3,0,0,4,1,4,1,4,1
+UAV Management System,com.uav.system.service.impl,UavServiceImpl,109,274,6,8,22,66,7,10,2,8
+UAV Management System,com.uav.system.service.impl,AiUavAttributeServiceImpl,243,86,20,0,35,4,11,2,1,2
+UAV Management System,com.uav.system.service.impl,AuthServiceImpl,27,6,4,0,7,3,6,1,4,1
+UAV Management System,com.uav.system.common,Result,36,35,0,0,11,10,7,6,7,6
+UAV Management System,com.uav.system,Application,5,3,0,0,2,1,1,1,1,1
+UAV Management System,com.uav.system.domain.dto,UavQueryDTO,31,0,0,0,14,0,9,0,9,0
+UAV Management System,com.uav.system.domain.dto,UavDTO,0,94,0,0,0,41,0,27,0,27
+UAV Management System,com.uav.system.domain.vo,LoginResponse,26,0,0,0,12,0,6,0,6,0
+UAV Management System,com.uav.system.domain.vo,PageResult,23,39,0,0,12,12,6,6,6,6

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.uav.system.exception;
+
+import com.uav.system.common.Result;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.stream.Collectors;
+
+// ============================================================
+// 全局异常处理器
+// 统一捕获业务异常、参数校验异常、未知异常，返回标准 Result 格式
+// ============================================================
+@RestControllerAdvice
+<span class="fc" id="L17">public class GlobalExceptionHandler {</span>
+
+    /**
+     * 处理序列号重复异常 → HTTP 409 Conflict
+     */
+    @ExceptionHandler(DuplicateSerialNumberException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Result&lt;Void&gt; handleDuplicateSerialNumber(DuplicateSerialNumberException e) {
+<span class="nc" id="L25">        return Result.error(HttpStatus.CONFLICT.value(), e.getMessage());</span>
+    }
+
+    /**
+     * 处理资源未找到异常 → HTTP 404 Not Found
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Result&lt;Void&gt; handleResourceNotFoundException(ResourceNotFoundException e) {
+<span class="nc" id="L34">        return Result.error(HttpStatus.NOT_FOUND.value(), e.getMessage());</span>
+    }
+
+    /**
+     * 处理通用业务异常 → HTTP 500 Internal Server Error
+     */
+    @ExceptionHandler(BusinessException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result&lt;Void&gt; handleBusinessException(BusinessException e) {
+<span class="nc" id="L43">        return Result.error(e.getMessage());</span>
+    }
+
+    /**
+     * 处理 @Valid 参数校验失败异常 → HTTP 400 Bad Request
+     * &lt;p&gt;提取所有字段的校验失败信息，组装为可读的字符串返回。&lt;/p&gt;
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result&lt;Void&gt; handleValidationException(MethodArgumentNotValidException e) {
+<span class="nc" id="L53">        String errors = e.getBindingResult().getFieldErrors().stream()</span>
+<span class="nc" id="L54">                .map(f -&gt; f.getField() + &quot;: &quot; + f.getDefaultMessage())</span>
+<span class="nc" id="L55">                .collect(Collectors.joining(&quot;; &quot;));</span>
+<span class="nc" id="L56">        return Result.error(HttpStatus.BAD_REQUEST.value(), &quot;Validation failed: &quot; + errors);</span>
+    }
+
+    /**
+     * 兜底异常处理器 — 处理所有未被上述方法捕获的未知异常
+     * &lt;p&gt;&lt;b&gt;注意：&lt;/b&gt;此处不返回具体异常消息，防止泄露敏感信息。&lt;/p&gt;
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result&lt;Void&gt; handleGenericException(Exception e) {
+        // TODO: 添加日志记录，便于排查问题
+<span class="nc" id="L67">        return Result.error(HttpStatus.INTERNAL_SERVER_ERROR.value(), &quot;Internal server error&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
