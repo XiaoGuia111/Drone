@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LocalDateTimeTypeHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.config</a> &gt; <span class="el_source">LocalDateTimeTypeHandler.java</span></div><h1>LocalDateTimeTypeHandler.java</h1><pre class="source lang-java linenums">package com.uav.system.config;
+
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedTypes;
+
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * MyBatis 类型处理器 —— LocalDateTime ↔ SQLite 字符串
+ *
+ * &lt;p&gt;由于 SQLite 没有原生的日期时间类型，LocalDateTime 需要以字符串格式存储。
+ * 本处理器将 Java 8 {@link LocalDateTime} 与 SQLite 中的字符串进行双向转换。&lt;/p&gt;
+ *
+ * &lt;p&gt;&lt;b&gt;存储格式：&lt;/b&gt;{@code yyyy-MM-dd HH:mm:ss}&lt;/p&gt;
+ * &lt;p&gt;&lt;b&gt;回读策略：&lt;/b&gt;优先使用自定义格式解析；如果失败，尝试使用 ISO_LOCAL_DATE_TIME 格式解析，提供兼容性。&lt;/p&gt;
+ *
+ * &lt;p&gt;&lt;b&gt;性能注意：&lt;/b&gt;DateTimeFormatter 是线程安全的，定义为 static final 常量复用。&lt;/p&gt;
+ *
+ * @see org.apache.ibatis.type.BaseTypeHandler
+ * @see LocalDateTypeHandler
+ */
+@MappedTypes(LocalDateTime.class)
+<span class="fc" id="L29">public class LocalDateTimeTypeHandler extends BaseTypeHandler&lt;LocalDateTime&gt; {</span>
+
+<span class="fc" id="L31">    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(&quot;yyyy-MM-dd HH:mm:ss&quot;);</span>
+
+    /**
+     * 将 LocalDateTime 转换为字符串写入 PreparedStatement
+     * &lt;p&gt;使用 &quot;yyyy-MM-dd HH:mm:ss&quot; 格式写入，适配 SQLite 的文本存储。&lt;/p&gt;
+     *
+     * @param ps        预编译 SQL 语句
+     * @param i         参数索引（从 1 开始）
+     * @param parameter Java 8 LocalDateTime 对象
+     * @param jdbcType  JDBC 类型（自动映射，可忽略）
+     * @throws SQLException SQL 执行异常
+     */
+    @Override
+    public void setNonNullParameter(PreparedStatement ps, int i, LocalDateTime parameter, JdbcType jdbcType) throws SQLException {
+<span class="nc" id="L45">        ps.setString(i, parameter.format(FORMATTER));</span>
+<span class="nc" id="L46">    }</span>
+
+    /**
+     * 从 ResultSet 中按列名读取 LocalDateTime
+     * &lt;p&gt;&lt;b&gt;回读策略：&lt;/b&gt;优先使用 &quot;yyyy-MM-dd HH:mm:ss&quot; 格式解析；
+     * 若失败，尝试使用 ISO_LOCAL_DATE_TIME 格式作为降级方案。
+     * 这种双格式兼容策略确保了前后数据格式不一致时的容错性。&lt;/p&gt;
+     *
+     * @param rs         结果集
+     * @param columnName 列名
+     * @return LocalDateTime 对象；数据库值为 null 时返回 null
+     * @throws SQLException SQL 执行异常
+     */
+    @Override
+    public LocalDateTime getNullableResult(ResultSet rs, String columnName) throws SQLException {
+<span class="fc" id="L61">        String value = rs.getString(columnName);</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if (value != null) {</span>
+            try {
+<span class="fc" id="L64">                return LocalDateTime.parse(value, FORMATTER);</span>
+<span class="nc" id="L65">            } catch (Exception e) {</span>
+<span class="nc" id="L66">                return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);</span>
+            }
+        }
+<span class="nc" id="L69">        return null;</span>
+    }
+
+    /**
+     * 从 ResultSet 中按列索引读取 LocalDateTime
+     *
+     * @param rs          结果集
+     * @param columnIndex 列索引（从 1 开始）
+     * @return LocalDateTime 对象；数据库值为 null 时返回 null
+     * @throws SQLException SQL 执行异常
+     */
+    @Override
+    public LocalDateTime getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+<span class="nc" id="L82">        String value = rs.getString(columnIndex);</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        if (value != null) {</span>
+            try {
+<span class="nc" id="L85">                return LocalDateTime.parse(value, FORMATTER);</span>
+<span class="nc" id="L86">            } catch (Exception e) {</span>
+<span class="nc" id="L87">                return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);</span>
+            }
+        }
+<span class="nc" id="L90">        return null;</span>
+    }
+
+    /**
+     * 从 CallableStatement 中按列索引读取 LocalDateTime
+     * &lt;p&gt;用于存储过程或函数的出参读取。&lt;/p&gt;
+     *
+     * @param cs          可调用语句
+     * @param columnIndex 列索引（从 1 开始）
+     * @return LocalDateTime 对象；数据库值为 null 时返回 null
+     * @throws SQLException SQL 执行异常
+     */
+    @Override
+    public LocalDateTime getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+<span class="nc" id="L104">        String value = cs.getString(columnIndex);</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (value != null) {</span>
+            try {
+<span class="nc" id="L107">                return LocalDateTime.parse(value, FORMATTER);</span>
+<span class="nc" id="L108">            } catch (Exception e) {</span>
+<span class="nc" id="L109">                return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME);</span>
+            }
+        }
+<span class="nc" id="L112">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

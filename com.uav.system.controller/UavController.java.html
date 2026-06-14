@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UavController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.controller</a> &gt; <span class="el_source">UavController.java</span></div><h1>UavController.java</h1><pre class="source lang-java linenums">package com.uav.system.controller;
+
+import com.uav.system.common.Result;
+import com.uav.system.domain.dto.UavDTO;
+import com.uav.system.domain.dto.UavQueryDTO;
+import com.uav.system.domain.vo.PageResult;
+import com.uav.system.service.api.AiUavAttributeService;
+import com.uav.system.service.api.UavService;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Map;
+
+/**
+ * 无人机信息管理 REST 控制器
+ *
+ * &lt;p&gt;提供无人机信息的 CRUD 操作和 AI 属性生成接口。&lt;/p&gt;
+ */
+@RestController
+@RequestMapping(&quot;/api/uavs&quot;)
+public class UavController {
+
+    private final UavService uavService;
+    private final AiUavAttributeService aiUavAttributeService;
+
+<span class="fc" id="L26">    public UavController(UavService uavService, AiUavAttributeService aiUavAttributeService) {</span>
+<span class="fc" id="L27">        this.uavService = uavService;</span>
+<span class="fc" id="L28">        this.aiUavAttributeService = aiUavAttributeService;</span>
+<span class="fc" id="L29">    }</span>
+
+    /**
+     * AI 自动生成无人机属性
+     *
+     * &lt;p&gt;根据无人机名称和型号，通过规则引擎模拟 AI 自动生成：
+     * 序列号、制造商、技术参数、描述等属性，辅助用户快速录入。&lt;/p&gt;
+     */
+    @PostMapping(&quot;/ai-generate&quot;)
+    public Result&lt;UavDTO&gt; aiGenerate(@RequestBody Map&lt;String, String&gt; request) {
+<span class="fc" id="L39">        String name = request.get(&quot;name&quot;);</span>
+<span class="fc" id="L40">        String model = request.get(&quot;model&quot;);</span>
+<span class="fc" id="L41">        UavDTO generated = aiUavAttributeService.generateAttributes(name, model);</span>
+<span class="fc" id="L42">        return Result.success(generated);</span>
+    }
+
+    @PostMapping
+    public Result&lt;UavDTO&gt; createUav(@Valid @RequestBody UavDTO dto) {
+<span class="fc" id="L47">        UavDTO created = uavService.createUav(dto);</span>
+<span class="fc" id="L48">        return Result.success(created);</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public Result&lt;UavDTO&gt; updateUav(@PathVariable Long id, @Valid @RequestBody UavDTO dto) {
+<span class="fc" id="L53">        UavDTO updated = uavService.updateUav(id, dto);</span>
+<span class="fc" id="L54">        return Result.success(updated);</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public Result&lt;UavDTO&gt; getUavById(@PathVariable Long id) {
+<span class="fc" id="L59">        UavDTO dto = uavService.getUavById(id);</span>
+<span class="fc" id="L60">        return Result.success(dto);</span>
+    }
+
+    @GetMapping
+    public Result&lt;PageResult&lt;UavDTO&gt;&gt; listUavs(
+            @RequestParam(defaultValue = &quot;1&quot;) int page,
+            @RequestParam(defaultValue = &quot;10&quot;) int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String model,
+            @RequestParam(required = false) String serialNumber,
+            @RequestParam(required = false) String status) {
+
+<span class="pc bpc" id="L72" title="4 of 6 branches missed.">        boolean hasQuery = (name != null &amp;&amp; !name.isEmpty()) ||</span>
+<span class="pc bpc" id="L73" title="3 of 4 branches missed.">                          (model != null &amp;&amp; !model.isEmpty()) ||</span>
+<span class="pc bpc" id="L74" title="3 of 4 branches missed.">                          (serialNumber != null &amp;&amp; !serialNumber.isEmpty()) ||</span>
+<span class="pc bnc" id="L75" title="All 2 branches missed.">                          (status != null &amp;&amp; !status.isEmpty());</span>
+
+        PageResult&lt;UavDTO&gt; result;
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if (hasQuery) {</span>
+<span class="nc" id="L79">            UavQueryDTO queryDTO = new UavQueryDTO();</span>
+<span class="nc" id="L80">            queryDTO.setName(name);</span>
+<span class="nc" id="L81">            queryDTO.setModel(model);</span>
+<span class="nc" id="L82">            queryDTO.setSerialNumber(serialNumber);</span>
+<span class="nc" id="L83">            queryDTO.setStatus(status);</span>
+<span class="nc" id="L84">            result = uavService.searchUavs(queryDTO, page, size);</span>
+<span class="nc" id="L85">        } else {</span>
+<span class="fc" id="L86">            result = uavService.listUavs(page, size);</span>
+        }
+<span class="fc" id="L88">        return Result.success(result);</span>
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public Result&lt;Void&gt; deleteUav(@PathVariable Long id) {
+<span class="fc" id="L93">        uavService.deleteUav(id);</span>
+<span class="fc" id="L94">        return Result.success();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

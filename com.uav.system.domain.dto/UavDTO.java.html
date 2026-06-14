@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UavDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.domain.dto</a> &gt; <span class="el_source">UavDTO.java</span></div><h1>UavDTO.java</h1><pre class="source lang-java linenums">package com.uav.system.domain.dto;
+
+import javax.validation.constraints.NotBlank;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+//无人机数据传输对象（DTO）
+public class UavDTO {
+    /** 主键 ID（新增时不传，更新时必传） */
+    private Long id;
+
+    /** 无人机名称（必填） */
+    @NotBlank(message = &quot;UAV name is required&quot;)
+    private String name;
+
+    /** 型号（必填） */
+    @NotBlank(message = &quot;Model is required&quot;)
+    private String model;
+
+    /** 序列号（必填，全局唯一） */
+    @NotBlank(message = &quot;Serial number is required&quot;)
+    private String serialNumber;
+
+    /** 制造商 */
+    private String manufacturer;
+
+    /** 生产日期 */
+    private LocalDate manufactureDate;
+
+    /** 最大飞行高度（单位：米） */
+    private Double maxAltitude;
+
+    /** 最大飞行速度（单位：km/h） */
+    private Double maxSpeed;
+
+    /** 重量（单位：kg） */
+    private Double weight;
+
+    /** 状态（必填，ACTIVE / MAINTENANCE / SCRAPPED） */
+    @NotBlank(message = &quot;Status is required&quot;)
+    private String status;
+
+    /** 描述备注 */
+    private String description;
+
+    /** 创建时间（由服务端自动填充） */
+    private LocalDateTime createdAt;
+
+    /** 更新时间（由服务端自动填充） */
+    private LocalDateTime updatedAt;
+
+<span class="fc" id="L52">    public UavDTO() {</span>
+<span class="fc" id="L53">    }</span>
+
+    public Long getId() {
+<span class="fc" id="L56">        return id;</span>
+    }
+
+    public void setId(Long id) {
+<span class="fc" id="L60">        this.id = id;</span>
+<span class="fc" id="L61">    }</span>
+
+    public String getName() {
+<span class="fc" id="L64">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L68">        this.name = name;</span>
+<span class="fc" id="L69">    }</span>
+
+    public String getModel() {
+<span class="fc" id="L72">        return model;</span>
+    }
+
+    public void setModel(String model) {
+<span class="fc" id="L76">        this.model = model;</span>
+<span class="fc" id="L77">    }</span>
+
+    public String getSerialNumber() {
+<span class="fc" id="L80">        return serialNumber;</span>
+    }
+
+    public void setSerialNumber(String serialNumber) {
+<span class="fc" id="L84">        this.serialNumber = serialNumber;</span>
+<span class="fc" id="L85">    }</span>
+
+    public String getManufacturer() {
+<span class="fc" id="L88">        return manufacturer;</span>
+    }
+
+    public void setManufacturer(String manufacturer) {
+<span class="fc" id="L92">        this.manufacturer = manufacturer;</span>
+<span class="fc" id="L93">    }</span>
+
+    public LocalDate getManufactureDate() {
+<span class="fc" id="L96">        return manufactureDate;</span>
+    }
+
+    public void setManufactureDate(LocalDate manufactureDate) {
+<span class="fc" id="L100">        this.manufactureDate = manufactureDate;</span>
+<span class="fc" id="L101">    }</span>
+
+    public Double getMaxAltitude() {
+<span class="fc" id="L104">        return maxAltitude;</span>
+    }
+
+    public void setMaxAltitude(Double maxAltitude) {
+<span class="fc" id="L108">        this.maxAltitude = maxAltitude;</span>
+<span class="fc" id="L109">    }</span>
+
+    public Double getMaxSpeed() {
+<span class="fc" id="L112">        return maxSpeed;</span>
+    }
+
+    public void setMaxSpeed(Double maxSpeed) {
+<span class="fc" id="L116">        this.maxSpeed = maxSpeed;</span>
+<span class="fc" id="L117">    }</span>
+
+    public Double getWeight() {
+<span class="fc" id="L120">        return weight;</span>
+    }
+
+    public void setWeight(Double weight) {
+<span class="fc" id="L124">        this.weight = weight;</span>
+<span class="fc" id="L125">    }</span>
+
+    public String getStatus() {
+<span class="fc" id="L128">        return status;</span>
+    }
+
+    public void setStatus(String status) {
+<span class="fc" id="L132">        this.status = status;</span>
+<span class="fc" id="L133">    }</span>
+
+    public String getDescription() {
+<span class="fc" id="L136">        return description;</span>
+    }
+
+    public void setDescription(String description) {
+<span class="fc" id="L140">        this.description = description;</span>
+<span class="fc" id="L141">    }</span>
+
+    public LocalDateTime getCreatedAt() {
+<span class="fc" id="L144">        return createdAt;</span>
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+<span class="fc" id="L148">        this.createdAt = createdAt;</span>
+<span class="fc" id="L149">    }</span>
+
+    public LocalDateTime getUpdatedAt() {
+<span class="fc" id="L152">        return updatedAt;</span>
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+<span class="fc" id="L156">        this.updatedAt = updatedAt;</span>
+<span class="fc" id="L157">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

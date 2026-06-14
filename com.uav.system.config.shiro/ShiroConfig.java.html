@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ShiroConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.config.shiro</a> &gt; <span class="el_source">ShiroConfig.java</span></div><h1>ShiroConfig.java</h1><pre class="source lang-java linenums">package com.uav.system.config.shiro;
+
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
+import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * Apache Shiro 安全框架配置
+ *
+ * &lt;p&gt;
+ * 配置 Shiro 的核心组件：
+ * &lt;/p&gt;
+ * &lt;ul&gt;
+ * &lt;li&gt;{@link SecurityManager} — 安全管理器，Shiro 的核心&lt;/li&gt;
+ * &lt;li&gt;{@link ShiroRealm} — 自定义 Realm，从数据库获取用户认证/授权信息&lt;/li&gt;
+ * &lt;li&gt;{@link ShiroFilterFactoryBean} — 过滤器链，定义 URL 的访问权限&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * &lt;p&gt;
+ * &lt;b&gt;过滤器链规则（按顺序匹配）：&lt;/b&gt;
+ * &lt;/p&gt;
+ * &lt;ul&gt;
+ * &lt;li&gt;{@code /static/**} — anon（静态资源匿名访问）&lt;/li&gt;
+ * &lt;li&gt;{@code /login} — anon（登录页面）&lt;/li&gt;
+ * &lt;li&gt;{@code /api/auth/login} — anon（登录接口）&lt;/li&gt;
+ * &lt;li&gt;{@code /api/**} — authc（需要登录认证）&lt;/li&gt;
+ * &lt;li&gt;{@code /**} — authc（其余所有页面需要认证）&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * @see ShiroRealm
+ */
+@Configuration
+<span class="fc" id="L40">public class ShiroConfig {</span>
+
+    /**
+     * 创建安全管理器
+     */
+    @Bean
+    public SecurityManager securityManager(ShiroRealm shiroRealm) {
+<span class="fc" id="L47">        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();</span>
+<span class="fc" id="L48">        securityManager.setRealm(shiroRealm);</span>
+<span class="fc" id="L49">        return securityManager;</span>
+    }
+
+    /**
+     * 配置 Shiro 过滤器链
+     *
+     * &lt;p&gt;
+     * 定义 URL 路径与访问权限的映射关系。
+     * &lt;/p&gt;
+     *
+     * @param securityManager 安全管理器
+     * @return ShiroFilterFactoryBean
+     */
+    @Bean
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(SecurityManager securityManager) {
+<span class="fc" id="L64">        ShiroFilterFactoryBean factoryBean = new ShiroFilterFactoryBean();</span>
+
+<span class="fc" id="L66">        factoryBean.setSecurityManager(securityManager);</span>
+        // 未登录时跳转到登录页面
+<span class="fc" id="L68">        factoryBean.setLoginUrl(&quot;/login&quot;);</span>
+        // 登录成功后跳转的首页
+<span class="fc" id="L70">        factoryBean.setSuccessUrl(&quot;/&quot;);</span>
+        // 未授权时跳转的页面
+<span class="fc" id="L72">        factoryBean.setUnauthorizedUrl(&quot;/login&quot;);</span>
+
+        // 自定义过滤器链：LinkedHashMap 保证顺序
+<span class="fc" id="L75">        Map&lt;String, String&gt; filterChainDefinitionMap = new LinkedHashMap&lt;&gt;();</span>
+
+        // 静态资源放行
+<span class="fc" id="L78">        filterChainDefinitionMap.put(&quot;/css/**&quot;, &quot;anon&quot;);</span>
+<span class="fc" id="L79">        filterChainDefinitionMap.put(&quot;/js/**&quot;, &quot;anon&quot;);</span>
+<span class="fc" id="L80">        filterChainDefinitionMap.put(&quot;/images/**&quot;, &quot;anon&quot;);</span>
+<span class="fc" id="L81">        filterChainDefinitionMap.put(&quot;/webjars/**&quot;, &quot;anon&quot;);</span>
+
+        // 登录相关放行
+<span class="fc" id="L84">        filterChainDefinitionMap.put(&quot;/login&quot;, &quot;anon&quot;);</span>
+<span class="fc" id="L85">        filterChainDefinitionMap.put(&quot;/api/auth/login&quot;, &quot;anon&quot;);</span>
+
+        // 登出
+<span class="fc" id="L88">        filterChainDefinitionMap.put(&quot;/logout&quot;, &quot;logout&quot;);</span>
+
+        // 所有 /api/** 和页面需要认证
+<span class="fc" id="L91">        filterChainDefinitionMap.put(&quot;/api/**&quot;, &quot;authc&quot;);</span>
+<span class="fc" id="L92">        filterChainDefinitionMap.put(&quot;/uav/**&quot;, &quot;authc&quot;);</span>
+<span class="fc" id="L93">        filterChainDefinitionMap.put(&quot;/&quot;, &quot;authc&quot;);</span>
+
+<span class="fc" id="L95">        factoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);</span>
+
+<span class="fc" id="L97">        return factoryBean;</span>
+    }
+
+    /**
+     * 启用 Shiro 注解支持（如 @RequiresRoles、@RequiresPermissions）
+     */
+    @Bean
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(SecurityManager securityManager) {
+<span class="fc" id="L105">        AuthorizationAttributeSourceAdvisor advisor = new AuthorizationAttributeSourceAdvisor();</span>
+<span class="fc" id="L106">        advisor.setSecurityManager(securityManager);</span>
+<span class="fc" id="L107">        return advisor;</span>
+    }
+
+    /**
+     * 自动代理创建器，确保 Shiro 注解生效
+     */
+    @Bean
+    public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
+<span class="fc" id="L115">        DefaultAdvisorAutoProxyCreator creator = new DefaultAdvisorAutoProxyCreator();</span>
+<span class="fc" id="L116">        creator.setProxyTargetClass(true);</span>
+<span class="fc" id="L117">        return creator;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

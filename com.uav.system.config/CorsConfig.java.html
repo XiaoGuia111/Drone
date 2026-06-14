@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CorsConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.config</a> &gt; <span class="el_source">CorsConfig.java</span></div><h1>CorsConfig.java</h1><pre class="source lang-java linenums">package com.uav.system.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+
+/**
+ * 跨域资源共享（CORS）配置
+ *
+ * &lt;p&gt;允许所有来源、所有请求头和所有 HTTP 方法的跨域请求，适用于前后端分离的开发模式。
+ * 过滤器优先级设置为 {@link Ordered#HIGHEST_PRECEDENCE}，确保在所有其他过滤器之前执行。&lt;/p&gt;
+ *
+ * &lt;p&gt;&lt;b&gt;安全提示：&lt;/b&gt;当前配置 {@code addAllowedOrigin(&quot;*&quot;)} 在生产环境中过于宽松，
+ * 建议上线后修改为明确的前端域名白名单。&lt;/p&gt;
+ */
+@Configuration
+<span class="fc" id="L21">public class CorsConfig {</span>
+
+    /**
+     * 注册 CORS 过滤器
+     * &lt;p&gt;允许所有来源（Origin）、所有请求头（Header）和所有 HTTP 方法（GET/POST/PUT/DELETE 等），
+     * 预检请求缓存时长为 3600 秒。&lt;/p&gt;
+     *
+     * @return CorsFilter 实例
+     */
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public CorsFilter corsFilter() {
+<span class="fc" id="L33">        CorsConfiguration config = new CorsConfiguration();</span>
+
+<span class="fc" id="L35">        config.addAllowedOrigin(&quot;*&quot;);</span>
+<span class="fc" id="L36">        config.addAllowedHeader(&quot;*&quot;);</span>
+<span class="fc" id="L37">        config.addAllowedMethod(&quot;*&quot;);</span>
+<span class="fc" id="L38">        config.setMaxAge(3600L);</span>
+
+<span class="fc" id="L40">        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="fc" id="L41">        source.registerCorsConfiguration(&quot;/**&quot;, config);</span>
+
+<span class="fc" id="L43">        return new CorsFilter(source);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

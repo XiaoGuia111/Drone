@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MyBatisConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.config</a> &gt; <span class="el_source">MyBatisConfig.java</span></div><h1>MyBatisConfig.java</h1><pre class="source lang-java linenums">package com.uav.system.config;
+
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+
+import javax.sql.DataSource;
+
+/**
+ * MyBatis 持久层框架配置
+ *
+ * &lt;p&gt;配置 MyBatis 的核心行为：&lt;/p&gt;
+ * &lt;ul&gt;
+ *   &lt;li&gt;扫描 {@code classpath:mapper/*.xml} 下的 SQL 映射文件&lt;/li&gt;
+ *   &lt;li&gt;配置实体类别名包，使 Mapper XML 中可以直接使用类名（如 {@code Uav}）无需全路径&lt;/li&gt;
+ *   &lt;li&gt;启用下划线到驼峰的自动映射（如 {@code serial_number} → {@code serialNumber}）&lt;/li&gt;
+ *   &lt;li&gt;注册自定义类型处理器（{@link LocalDateTypeHandler}、{@link LocalDateTimeTypeHandler}）
+ *       以支持 Java 8 日期时间类型与 SQLite 字符串格式之间的互转&lt;/li&gt;
+ * &lt;/ul&gt;
+ *
+ * @see LocalDateTypeHandler
+ * @see LocalDateTimeTypeHandler
+ */
+@org.springframework.context.annotation.Configuration
+<span class="fc" id="L27">public class MyBatisConfig {</span>
+
+    /**
+     * 创建 MyBatis SqlSessionFactory
+     *
+     * @param dataSource 数据源
+     * @return SqlSessionFactory 实例
+     * @throws Exception 加载映射文件失败时抛出
+     */
+    @Bean
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+<span class="fc" id="L38">        SqlSessionFactoryBean sessionFactory = new SqlSessionFactoryBean();</span>
+<span class="fc" id="L39">        sessionFactory.setDataSource(dataSource);</span>
+<span class="fc" id="L40">        sessionFactory.setMapperLocations(</span>
+<span class="fc" id="L41">            new PathMatchingResourcePatternResolver().getResources(&quot;classpath:mapper/*.xml&quot;)</span>
+        );
+<span class="fc" id="L43">        sessionFactory.setTypeAliasesPackage(&quot;com.uav.system.domain.entity&quot;);</span>
+
+<span class="fc" id="L45">        Configuration configuration = new Configuration();</span>
+        // 启用下划线转驼峰：如数据库列 created_at 映射为实体字段 createdAt
+<span class="fc" id="L47">        configuration.setMapUnderscoreToCamelCase(true);</span>
+
+        // 注册 Java 8 日期类型处理器（SQLite 不支持原生日期类型）
+<span class="fc" id="L50">        configuration.getTypeHandlerRegistry().register(LocalDateTypeHandler.class);</span>
+<span class="fc" id="L51">        configuration.getTypeHandlerRegistry().register(LocalDateTimeTypeHandler.class);</span>
+
+<span class="fc" id="L53">        sessionFactory.setConfiguration(configuration);</span>
+
+<span class="fc" id="L55">        return sessionFactory.getObject();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

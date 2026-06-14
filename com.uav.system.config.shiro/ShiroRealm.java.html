@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ShiroRealm.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.config.shiro</a> &gt; <span class="el_source">ShiroRealm.java</span></div><h1>ShiroRealm.java</h1><pre class="source lang-java linenums">package com.uav.system.config.shiro;
+
+import com.uav.system.domain.entity.User;
+import com.uav.system.repository.mapper.UserMapper;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UnknownAccountException;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.springframework.stereotype.Component;
+
+/**
+ * Shiro 自定义 Realm — 用户认证与授权
+ *
+ * &lt;p&gt;
+ * 从数据库读取用户信息进行身份验证，并根据用户角色授予对应权限。
+ * &lt;/p&gt;
+ *
+ * @see UserMapper
+ * @see User
+ */
+@Component
+public class ShiroRealm extends AuthorizingRealm {
+
+    private final UserMapper userMapper;
+
+<span class="fc" id="L32">    public ShiroRealm(UserMapper userMapper) {</span>
+<span class="fc" id="L33">        this.userMapper = userMapper;</span>
+        // 自定义密码匹配器：处理 UsernamePasswordToken 的 credentials 是 char[] 类型的情况
+        // SimpleCredentialsMatcher 默认调用 String.equals(char[]) 会返回 false
+<span class="fc" id="L36">        setCredentialsMatcher(new CredentialsMatcher() {</span>
+            @Override
+            public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
+<span class="nc" id="L39">                String tokenCredentials = new String((char[]) token.getCredentials());</span>
+<span class="nc" id="L40">                String accountCredentials = (String) info.getCredentials();</span>
+<span class="nc" id="L41">                return tokenCredentials.equals(accountCredentials);</span>
+            }
+        });
+<span class="fc" id="L44">    }</span>
+
+    /**
+     * 授权：根据用户角色分配权限
+     */
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+<span class="nc" id="L51">        String username = (String) principals.getPrimaryPrincipal();</span>
+<span class="nc" id="L52">        User user = userMapper.findByUsername(username);</span>
+
+<span class="nc" id="L54">        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();</span>
+<span class="nc bnc" id="L55" title="All 4 branches missed.">        if (user != null &amp;&amp; user.getRole() != null) {</span>
+<span class="nc" id="L56">            info.addRole(user.getRole());</span>
+        }
+<span class="nc" id="L58">        return info;</span>
+    }
+
+    /**
+     * 认证：验证用户名密码
+     *
+     * &lt;p&gt;
+     * 从数据库加载用户信息，返回 SimpleAuthenticationInfo 后由 CredentialsMatcher 自动比对密码。
+     * UsernamePasswordToken.getCredentials() 返回 char[]，需要自定义密码匹配器。
+     * &lt;/p&gt;
+     */
+    @Override
+    protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
+<span class="nc" id="L71">        String username = (String) token.getPrincipal();</span>
+<span class="nc" id="L72">        User user = userMapper.findByUsername(username);</span>
+
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if (user == null) {</span>
+<span class="nc" id="L75">            throw new UnknownAccountException(&quot;Invalid username or password&quot;);</span>
+        }
+
+<span class="nc" id="L78">        return new SimpleAuthenticationInfo(</span>
+<span class="nc" id="L79">                user.getUsername(),</span>
+<span class="nc" id="L80">                user.getPassword(),</span>
+<span class="nc" id="L81">                getName());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

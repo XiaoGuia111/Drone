@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PageController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.controller</a> &gt; <span class="el_source">PageController.java</span></div><h1>PageController.java</h1><pre class="source lang-java linenums">package com.uav.system.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+
+/**
+ * 页面路由控制器
+ *
+ * &lt;p&gt;负责 Thymeleaf 视图的页面导航，所有页面路径映射在此统一管理。&lt;/p&gt;
+ */
+@Controller
+<span class="fc" id="L12">public class PageController {</span>
+
+    /**
+     * 登录页面
+     */
+    @GetMapping(&quot;/login&quot;)
+    public String login() {
+<span class="nc" id="L19">        return &quot;login&quot;;</span>
+    }
+
+    /**
+     * 首页/UAV 列表页面
+     */
+    @GetMapping({&quot;/&quot;, &quot;/index&quot;, &quot;/uav/list&quot;})
+    public String index() {
+<span class="nc" id="L27">        return &quot;uav/list&quot;;</span>
+    }
+
+    /**
+     * 新增无人机页面
+     */
+    @GetMapping(&quot;/uav/create&quot;)
+    public String create() {
+<span class="nc" id="L35">        return &quot;uav/form&quot;;</span>
+    }
+
+    /**
+     * 编辑无人机页面
+     */
+    @GetMapping(&quot;/uav/edit&quot;)
+    public String edit() {
+<span class="nc" id="L43">        return &quot;uav/form&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>

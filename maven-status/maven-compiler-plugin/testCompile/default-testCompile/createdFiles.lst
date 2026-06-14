@@ -1,0 +1,5 @@
+com\uav\system\repository\mapper\UavMapperTest.class
+com\uav\system\service\UavServiceTest.class
+com\uav\system\config\shiro\TestShiroConfig.class
+com\uav\system\controller\UavControllerTest.class
+com\uav\system\controller\AuthControllerTest.class

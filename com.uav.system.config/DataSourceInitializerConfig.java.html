@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataSourceInitializerConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">UAV Management System</a> &gt; <a href="index.source.html" class="el_package">com.uav.system.config</a> &gt; <span class="el_source">DataSourceInitializerConfig.java</span></div><h1>DataSourceInitializerConfig.java</h1><pre class="source lang-java linenums">package com.uav.system.config;
+
+import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+
+import javax.sql.DataSource;
+
+/**
+ * 数据库初始化配置
+ *
+ * &lt;p&gt;在应用启动时自动执行 {@code classpath:schema.sql} 脚本，
+ * 确保 {@code users} 和 {@code uavs} 表存在，并插入默认的 admin 用户。&lt;/p&gt;
+ *
+ * &lt;p&gt;&lt;b&gt;注意：&lt;/b&gt;{@code setContinueOnError(true)} 允许脚本在遇到错误时继续执行，
+ * 这在首次启动表已存在时避免报错中断。&lt;/p&gt;
+ *
+ * @see DataSourceInitializer
+ * @see ResourceDatabasePopulator
+ */
+@Configuration
+<span class="fc" id="L26">public class DataSourceInitializerConfig implements ResourceLoaderAware {</span>
+
+    private ResourceLoader resourceLoader;
+
+    @Override
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+<span class="fc" id="L32">        this.resourceLoader = resourceLoader;</span>
+<span class="fc" id="L33">    }</span>
+
+    /**
+     * 创建数据源初始化器 Bean
+     * &lt;p&gt;加载 schema.sql 脚本并在 DataSource 上执行。&lt;/p&gt;
+     *
+     * @param dataSource 注入的数据源
+     * @return DataSourceInitializer 实例
+     */
+    @Bean
+    public DataSourceInitializer dataSourceInitializer(DataSource dataSource) {
+<span class="fc" id="L44">        ResourceDatabasePopulator populator = new ResourceDatabasePopulator();</span>
+<span class="fc" id="L45">        Resource schemaResource = resourceLoader.getResource(&quot;classpath:schema.sql&quot;);</span>
+<span class="fc" id="L46">        populator.addScript(schemaResource);</span>
+<span class="fc" id="L47">        populator.setContinueOnError(true); // 表已存在时不中断</span>
+
+<span class="fc" id="L49">        DataSourceInitializer initializer = new DataSourceInitializer();</span>
+<span class="fc" id="L50">        initializer.setDataSource(dataSource);</span>
+<span class="fc" id="L51">        initializer.setDatabasePopulator(populator);</span>
+<span class="fc" id="L52">        return initializer;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.6.202009150832</span></div></body></html>
