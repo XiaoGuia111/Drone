@@ -1,0 +1,61 @@
+# ============================================================
+# 无人机信息管理系统 — 应用配置
+# 使用 YAML 多文档块（---）分隔不同 Profile 的配置
+# 默认激活 sqlite profile
+# ============================================================
+
+server:
+  port: 8088
+  tomcat:
+    uri-encoding: UTF-8
+
+spring:
+  profiles:
+    active: sqlite
+  main:
+    allow-bean-definition-overriding: true
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+---
+# SQLite 开发环境配置
+# 使用文件型 SQLite 数据库，无需额外安装数据库服务，方便本地开发调试
+spring:
+  profiles: sqlite
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:./data/uav.db
+    type: com.alibaba.druid.pool.DruidDataSource
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      encoding: UTF-8
+
+---
+# MySQL 生产环境配置（可选）
+# 使用前需在本地安装 MySQL 并创建 uav_db 数据库
+spring:
+  profiles: mysql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/uav_db?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+
+# MyBatis 全局配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml # 告诉MyBatis 去哪里找Mapper.xml文件，并且把其中SQL语句加载到内存中
+  type-aliases-package: com.uav.system.domain.entity # 告诉MyBatis 去哪里找实体类包，用于简化实体类类名
+  configuration:
+    map-underscore-to-camel-case: true # 开启下划线映射到驼峰命名法，自动映射数据库表字段->实体类字段
+
+# 日志级别配置
+logging:
+  level:
+    com.uav.system: debug
+    org.springframework.jdbc: debug
